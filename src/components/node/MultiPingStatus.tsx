@@ -13,6 +13,13 @@ import { formatHealthBucketTooltip } from "./pingBucketText";
 
 type MultiPingStatusDensity = "large" | "compact";
 type MultiPingMetric = "latency" | "loss";
+type ReturnRouteQuality = "excellent" | "good" | "standard";
+
+const RETURN_ROUTE_QUALITY_LABEL: Record<ReturnRouteQuality, string> = {
+  excellent: "优质",
+  good: "良好",
+  standard: "一般",
+};
 
 const MultiPingMetricRow = memo(function MultiPingMetricRow({
   uuid,
@@ -65,6 +72,7 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
   const waiting = isLoading && value == null;
   const routeLabel =
     metric === "latency" ? returnRouteLabel(line.taskId, returnRoute) : undefined;
+  const routeQuality = routeLabel ? classifyReturnRoute(routeLabel) : undefined;
   const displayValue =
     waiting
       ? "..."
@@ -92,7 +100,21 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
         {metric === "latency" && (
           <span className="multi-ping-name-group">
             <PingLineSwitcher uuid={uuid} slot={slot} taskName={line.taskName} />
-            {routeLabel && <span className="multi-ping-route-label">{routeLabel}</span>}
+            {routeLabel && routeQuality && (
+              <span
+                className={clsx("multi-ping-route-badge", `is-${routeQuality}`)}
+                title={`回程线路：${routeLabel}，${RETURN_ROUTE_QUALITY_LABEL[routeQuality]}`}
+                aria-label={`回程线路 ${routeLabel}，${RETURN_ROUTE_QUALITY_LABEL[routeQuality]}`}
+              >
+                <span>{routeLabel}</span>
+                <span className="multi-ping-route-separator" aria-hidden="true">
+                  ·
+                </span>
+                <span className="multi-ping-route-quality">
+                  {RETURN_ROUTE_QUALITY_LABEL[routeQuality]}
+                </span>
+              </span>
+            )}
           </span>
         )}
         <strong
@@ -221,4 +243,20 @@ function returnRouteLabel(taskId: number, route?: ReturnRoute): string | undefin
   if (key === "cu") return route.unicom?.trim() || undefined;
   if (key === "cm") return route.mobile?.trim() || undefined;
   return undefined;
+}
+
+function classifyReturnRoute(label: string): ReturnRouteQuality {
+  const normalized = label.trim().toUpperCase().replace(/\s+/g, "");
+  if (
+    normalized.includes("CN2GIA") ||
+    normalized === "CN2" ||
+    normalized.includes("9929") ||
+    normalized.includes("CMIN2")
+  ) {
+    return "excellent";
+  }
+  if (normalized.includes("10099") || normalized === "CMI") {
+    return "good";
+  }
+  return "standard";
 }

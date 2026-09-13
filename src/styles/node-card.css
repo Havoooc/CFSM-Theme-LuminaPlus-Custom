@@ -474,7 +474,7 @@
   white-space: nowrap;
 }
 
-/* 回程线路类型紧跟运营商名称显示（如「联通 9929」），不挤占右侧延迟数值。 */
+/* 回程线路类型紧跟运营商名称显示，不挤占右侧延迟数值。 */
 .multi-ping-name-group {
   display: flex;
   min-width: 0;
@@ -488,13 +488,54 @@
   max-width: none;
 }
 
-.multi-ping-route-label {
-  flex: 0 0 auto;
-  color: var(--text-tertiary);
+.multi-ping-route-badge {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  flex: 0 1 auto;
+  gap: 3px;
+  padding: 2px 5px;
+  overflow: hidden;
+  border: 1px solid var(--route-badge-border, var(--border-subtle));
+  border-radius: 999px;
+  background: var(--route-badge-bg, var(--fill-tertiary));
+  color: var(--route-badge-fg, var(--text-tertiary));
   font-size: 9px;
-  font-weight: 560;
-  letter-spacing: 0;
+  font-weight: 650;
+  line-height: 1.15;
   white-space: nowrap;
+}
+
+.multi-ping-route-badge > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multi-ping-route-badge.is-excellent {
+  --route-badge-bg: color-mix(in srgb, var(--status-online) 12%, transparent);
+  --route-badge-border: color-mix(in srgb, var(--status-online) 35%, var(--border-subtle));
+  --route-badge-fg: var(--status-online);
+}
+
+.multi-ping-route-badge.is-good {
+  --route-badge-bg: color-mix(in srgb, var(--status-info) 12%, transparent);
+  --route-badge-border: color-mix(in srgb, var(--status-info) 35%, var(--border-subtle));
+  --route-badge-fg: var(--status-info);
+}
+
+.multi-ping-route-badge.is-standard {
+  --route-badge-bg: color-mix(in srgb, var(--status-warning) 12%, transparent);
+  --route-badge-border: color-mix(in srgb, var(--status-warning) 35%, var(--border-subtle));
+  --route-badge-fg: var(--status-warning);
+}
+
+.multi-ping-route-separator {
+  opacity: 0.65;
+}
+
+.multi-ping-route-quality {
+  flex: 0 0 auto;
 }
 
 /* 线路名本身就是切换按钮（点开换这一行显示的线路，见 PingLineSwitcher）。外观和原来那行小字一样，
