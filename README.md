@@ -1,5 +1,8 @@
 # CFSM-Theme-LuminaPlus
 
+> 此分支为 `monitor.havooc.cc` 的定制构建：仅将干杯云节点的前三条 Ping
+> 标签显示为 VMISS、V.PS、QQG；其他节点保持站点全局名称。
+
 [CF-Server-Monitor](https://github.com/huilang-me/CF-Server-Monitor) 的第三方主题，
 由 [Komari-Theme-LuminaPlus](https://github.com/shanyang242/Komari-Theme-LuminaPlus) 移植而来。
 

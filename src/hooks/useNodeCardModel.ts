@@ -36,6 +36,7 @@ import {
   hasHomepagePingTaskBinding,
   isHomepageMultiPingConfigured,
 } from "@/utils/pingTasks";
+import { nodePingTaskName } from "@/utils/customPingNames";
 
 interface NodeCardModelOptions {
   pingBucketCount?: number;
@@ -161,6 +162,7 @@ export function useNodeCardModel(
         };
       return {
         ...line,
+        taskName: nodePingTaskName(uuid, taskId, line.taskName),
         buckets: buildPingBuckets(
           line,
           pingBucketCount,

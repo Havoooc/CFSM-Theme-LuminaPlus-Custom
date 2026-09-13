@@ -34,6 +34,7 @@ import {
   type PingLossSample,
 } from "@/utils/pingMetrics";
 import { usePreferences } from "@/hooks/usePreferences";
+import { nodePingTaskName } from "@/utils/customPingNames";
 import type { PingRecord, PingTaskStats } from "@/types/cfsm";
 import type { TimedMetricPoint } from "./chartData";
 
@@ -157,9 +158,9 @@ export function PingChart({
     () =>
       (data?.tasks ?? []).map((task) => ({
         ...task,
-        name: carrierTaskName(task.id, carrierNames),
+        name: nodePingTaskName(uuid, task.id, carrierTaskName(task.id, carrierNames)),
       })),
-    [carrierNames, data],
+    [carrierNames, data, uuid],
   );
   const taskLabels = useMemo(() => {
     const counts = new Map<string, number>();

@@ -24,6 +24,7 @@ import {
   resolveNodePingLineTaskIds,
   switchPingLine,
 } from "@/utils/pingLineOverrides";
+import { nodePingTaskName } from "@/utils/customPingNames";
 
 /** 浮层和线路名之间的空隙，与实例切换器 / 排序浮层的 `calc(100% + 6px)` 一致。 */
 const PANEL_GAP_PX = 6;
@@ -232,7 +233,9 @@ function PingLineMenu({
             aria-current={active ? "true" : undefined}
             onClick={() => select(taskId)}
           >
-            <span className="ping-line-menu-label">{carrierTaskName(taskId, carrierNames)}</span>
+            <span className="ping-line-menu-label">
+              {nodePingTaskName(uuid, taskId, carrierTaskName(taskId, carrierNames))}
+            </span>
             {swaps && <span className="ping-line-menu-hint">互换</span>}
             {active && <Check size={14} aria-hidden />}
           </button>
