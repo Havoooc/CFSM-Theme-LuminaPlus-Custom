@@ -334,8 +334,20 @@ function shallowEqualNodeInfo(a: NodeInfo, b: NodeInfo) {
     a.traffic_limit_type === b.traffic_limit_type &&
     a.traffic_reset_day === b.traffic_reset_day &&
     a.report_interval === b.report_interval &&
-    a.agent_version === b.agent_version
+    a.agent_version === b.agent_version &&
+    sameReturnRoute(a.return_route, b.return_route)
     // updated_at 是未展示的心跳字段，不应触发整个节点列表重渲染。
+  );
+}
+
+function sameReturnRoute(a: NodeInfo["return_route"], b: NodeInfo["return_route"]): boolean {
+  if (a === b) return true;
+  if (!a || !b) return !a && !b;
+  return (
+    a.region === b.region &&
+    a.telecom === b.telecom &&
+    a.unicom === b.unicom &&
+    a.mobile === b.mobile
   );
 }
 

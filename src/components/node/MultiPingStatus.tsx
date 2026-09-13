@@ -2,7 +2,8 @@ import { memo, useState } from "react";
 import { clsx } from "clsx";
 import { useMetricColorsVersion } from "@/hooks/useMetricColors";
 import { usePreferences } from "@/hooks/usePreferences";
-import type { HomepagePingDisplayLine } from "@/types/cfsm";
+import type { HomepagePingDisplayLine, ReturnRoute } from "@/types/cfsm";
+import { CARRIER_TASK_BY_ID } from "@/services/cfsm/mappers";
 import { latencyHeatColor, lossHeatColor } from "@/utils/metricTone";
 import { HealthBucketTooltip } from "./HealthBucketTooltip";
 import { LatencyBars } from "./LatencyBars";
@@ -20,6 +21,7 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
   metric,
   density,
   redrawKey,
+  returnRoute,
 }: {
   uuid: string;
   slot: number;
@@ -27,6 +29,7 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
   metric: MultiPingMetric;
   density: MultiPingStatusDensity;
   redrawKey: string;
+  returnRoute?: ReturnRoute;
 }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const latencyColor = latencyHeatColor(line.lastValue);
@@ -60,6 +63,8 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
   const valueColor = metric === "latency" ? latencyColor : lossColor;
   const unit = metric === "latency" ? "ms" : "%";
   const waiting = isLoading && value == null;
+  const routeLabel =
+    metric === "latency" ? returnRouteLabel(line.taskId, returnRoute) : undefined;
   const displayValue =
     waiting
       ? "..."
@@ -85,7 +90,10 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
         )}
       >
         {metric === "latency" && (
-          <PingLineSwitcher uuid={uuid} slot={slot} taskName={line.taskName} />
+          <span className="multi-ping-name-group">
+            <PingLineSwitcher uuid={uuid} slot={slot} taskName={line.taskName} />
+            {routeLabel && <span className="multi-ping-route-label">{routeLabel}</span>}
+          </span>
         )}
         <strong
           className="multi-ping-value tabular"
@@ -129,12 +137,14 @@ const MultiPingMetricColumn = memo(function MultiPingMetricColumn({
   metric,
   density,
   redrawKey,
+  returnRoute,
 }: {
   uuid: string;
   lines: HomepagePingDisplayLine[];
   metric: MultiPingMetric;
   density: MultiPingStatusDensity;
   redrawKey: string;
+  returnRoute?: ReturnRoute;
 }) {
   return (
     <div
@@ -152,6 +162,7 @@ const MultiPingMetricColumn = memo(function MultiPingMetricColumn({
           metric={metric}
           density={density}
           redrawKey={redrawKey}
+          returnRoute={returnRoute}
         />
       ))}
     </div>
@@ -163,11 +174,13 @@ export const MultiPingStatus = memo(function MultiPingStatus({
   lines,
   density,
   className,
+  returnRoute,
 }: {
   uuid: string;
   lines: HomepagePingDisplayLine[];
   density: MultiPingStatusDensity;
   className?: string;
+  returnRoute?: ReturnRoute;
 }) {
   const { resolvedAppearance } = usePreferences();
   const colorsVersion = useMetricColorsVersion();
@@ -186,6 +199,7 @@ export const MultiPingStatus = memo(function MultiPingStatus({
           metric="latency"
           density={density}
           redrawKey={redrawKey}
+          returnRoute={returnRoute}
         />
         <MultiPingMetricColumn
           uuid={uuid}
@@ -193,8 +207,18 @@ export const MultiPingStatus = memo(function MultiPingStatus({
           metric="loss"
           density={density}
           redrawKey={redrawKey}
+          returnRoute={returnRoute}
         />
       </div>
     </div>
   );
 });
+
+function returnRouteLabel(taskId: number, route?: ReturnRoute): string | undefined {
+  if (!route) return undefined;
+  const key = CARRIER_TASK_BY_ID.get(taskId)?.key;
+  if (key === "ct") return route.telecom?.trim() || undefined;
+  if (key === "cu") return route.unicom?.trim() || undefined;
+  if (key === "cm") return route.mobile?.trim() || undefined;
+  return undefined;
+}

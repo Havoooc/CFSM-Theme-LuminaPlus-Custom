@@ -17,6 +17,8 @@ import {
   type NodeMetrics,
   type PingRecord,
   type PingTask,
+  ReturnRouteSchema,
+  type ReturnRoute,
 } from "@/types/cfsm";
 
 /** 后端内存/磁盘字段的单位是 MiB，流量配额是 GB。 */
@@ -224,6 +226,22 @@ export function gpuUsagePercent(entries: GpuEntry[]): number {
   return Math.max(...values);
 }
 
+/** 兼容后端早期把回程线路存成 JSON 字符串的版本。 */
+export function parseReturnRoute(value: unknown): ReturnRoute | undefined {
+  let raw: unknown = value;
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    try {
+      raw = JSON.parse(trimmed);
+    } catch {
+      return undefined;
+    }
+  }
+  const parsed = ReturnRouteSchema.safeParse(raw);
+  return parsed.success ? parsed.data : undefined;
+}
+
 /**
  * 配额单位是 GB（后台输入框即以 GB 计）。为兼容手填的 `"1TB"` 这类值，
  * 带单位后缀时按后缀换算。
@@ -329,6 +347,7 @@ export function toNodeInfo(server: CfsmServer): NodeInfo {
     traffic_reset_day: server.reset_day,
     report_interval: server.report_interval,
     agent_version: server.agent_version,
+    return_route: parseReturnRoute(server.return_route),
     // 公共接口只给可达性标记，不给具体地址。
     ipv4: String(server.ip_v4) === "1" ? "1" : "",
     ipv6: String(server.ip_v6) === "1" ? "1" : "",

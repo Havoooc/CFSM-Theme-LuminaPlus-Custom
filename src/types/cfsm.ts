@@ -27,6 +27,21 @@ const nullableNumber = z
   })
   .nullish()
   .catch(null);
+
+/**
+ * 节点到浙江三网探测点的回程线路类型。后端探针把它作为 JSON 对象上报；
+ * 字段缺失时主题不显示线路标签，避免旧节点卡片出现误导性的占位文字。
+ */
+export const ReturnRouteSchema = z
+  .object({
+    region: z.string().optional(),
+    telecom: z.string().optional(),
+    unicom: z.string().optional(),
+    mobile: z.string().optional(),
+  })
+  .passthrough();
+
+export type ReturnRoute = z.output<typeof ReturnRouteSchema>;
 /** 磁盘 IO；旧探针或全零时后端不会下发该对象。 */
 export const DiskIoSchema = z
   .object({
@@ -149,6 +164,7 @@ export const CfsmServerSchema = z
     ip_v6: looseString.default("0"),
     boot_time: looseString.default(""),
     agent_version: looseString.default(""),
+    return_route: ReturnRouteSchema.nullish(),
     last_updated: looseNumber.default(0),
     timestamp: looseNumber.default(0),
     is_online: z.boolean().optional(),
@@ -368,6 +384,8 @@ export interface NodeInfo {
   /** 探针上报间隔，秒。 */
   report_interval: number;
   agent_version: string;
+  /** 节点到浙江电信/联通/移动探测点的回程线路类型。 */
+  return_route?: ReturnRoute;
   /** CF-Server-Monitor 只下发可达性，不下发具体地址。 */
   ipv4: string;
   ipv6: string;

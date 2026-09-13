@@ -762,6 +762,7 @@ export const CompactNodeCard = memo(function CompactNodeCard({
           uuid={uuid}
           lines={homepagePingLines}
           density="compact"
+          returnRoute={node.return_route}
           className="compact-node-bottom"
         />
       ) : (

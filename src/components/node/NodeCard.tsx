@@ -158,6 +158,7 @@ export const NodeCard = memo(function NodeCard({
               uuid={uuid}
               lines={homepagePingLines}
               density="large"
+              returnRoute={node.return_route}
               className="card-metric-section"
             />
           ) : (
