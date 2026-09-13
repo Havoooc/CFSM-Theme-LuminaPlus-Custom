@@ -679,3 +679,27 @@
     gap: 7px;
   }
 }
+.server-card,
+.compact-node-card {
+  border-radius: 18px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 7%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.server-card:hover,
+.compact-node-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--accent-500) 14%, transparent);
+}
+
+.server-card h2,
+.compact-node-card h2 {
+  letter-spacing: -0.015em;
+}
+
+@media (max-width: 640px) {
+  .server-card,
+  .compact-node-card {
+    border-radius: 16px;
+  }
+}
