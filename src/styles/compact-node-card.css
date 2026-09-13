@@ -679,6 +679,41 @@
     gap: 7px;
   }
 }
+
+/* 手机端：压缩卡片留白，同时保留足够的触控区域。 */
+@media (max-width: 640px) {
+  .compact-node-card {
+    padding: 13px;
+  }
+
+  .compact-node-header {
+    gap: 8px;
+  }
+
+  .compact-node-title {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .compact-node-vitals {
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .compact-node-info-strip {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .compact-node-info-tile {
+    min-height: 46px;
+    padding: 6px 7px;
+  }
+
+  .compact-node-health {
+    margin-top: 8px;
+  }
+}
 .server-card,
 .compact-node-card {
   border-radius: 18px;
