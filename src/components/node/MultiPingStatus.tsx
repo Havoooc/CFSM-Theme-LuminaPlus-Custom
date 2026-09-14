@@ -5,6 +5,11 @@ import { usePreferences } from "@/hooks/usePreferences";
 import type { HomepagePingDisplayLine, ReturnRoute } from "@/types/cfsm";
 import { CARRIER_TASK_BY_ID } from "@/services/cfsm/mappers";
 import { latencyHeatColor, lossHeatColor } from "@/utils/metricTone";
+import {
+  RETURN_ROUTE_QUALITY_LABEL,
+  classifyReturnRoute,
+  returnRouteTitle,
+} from "@/utils/returnRoute";
 import { HealthBucketTooltip } from "./HealthBucketTooltip";
 import { LatencyBars } from "./LatencyBars";
 import { PingLineSwitcher } from "./PingLineSwitcher";
@@ -13,13 +18,6 @@ import { formatHealthBucketTooltip } from "./pingBucketText";
 
 type MultiPingStatusDensity = "large" | "compact";
 type MultiPingMetric = "latency" | "loss";
-type ReturnRouteQuality = "excellent" | "good" | "standard";
-
-const RETURN_ROUTE_QUALITY_LABEL: Record<ReturnRouteQuality, string> = {
-  excellent: "优质",
-  good: "良好",
-  standard: "一般",
-};
 
 const MultiPingMetricRow = memo(function MultiPingMetricRow({
   uuid,
@@ -103,8 +101,8 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
             {routeLabel && routeQuality && (
               <span
                 className={clsx("multi-ping-route-badge", `is-${routeQuality}`)}
-                title={`回程线路：${routeLabel}，${RETURN_ROUTE_QUALITY_LABEL[routeQuality]}`}
-                aria-label={`回程线路 ${routeLabel}，${RETURN_ROUTE_QUALITY_LABEL[routeQuality]}`}
+                title={returnRouteTitle(routeLabel, routeQuality)}
+                aria-label={returnRouteTitle(routeLabel, routeQuality).replace("：", " ")}
               >
                 <span>{routeLabel}</span>
                 <span className="multi-ping-route-separator" aria-hidden="true">
@@ -243,20 +241,4 @@ function returnRouteLabel(taskId: number, route?: ReturnRoute): string | undefin
   if (key === "cu") return route.unicom?.trim() || undefined;
   if (key === "cm") return route.mobile?.trim() || undefined;
   return undefined;
-}
-
-function classifyReturnRoute(label: string): ReturnRouteQuality {
-  const normalized = label.trim().toUpperCase().replace(/\s+/g, "");
-  if (
-    normalized.includes("CN2GIA") ||
-    normalized === "CN2" ||
-    normalized.includes("9929") ||
-    normalized.includes("CMIN2")
-  ) {
-    return "excellent";
-  }
-  if (normalized.includes("10099") || normalized === "CMI") {
-    return "good";
-  }
-  return "standard";
 }
