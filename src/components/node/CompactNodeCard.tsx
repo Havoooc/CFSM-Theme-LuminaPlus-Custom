@@ -517,7 +517,7 @@ function CompactNodeInfoStrip({
       </CompactInfoTile>
       {showTrafficTotal && (
         <CompactInfoTile
-          label="累计流量"
+          label="月度流量"
           color="var(--text-primary)"
         >
           <CompactInfoRow
@@ -528,7 +528,7 @@ function CompactNodeInfoStrip({
                 aria-label="上行"
               />
             )}
-            value={formatBytes(node.trafficUp)}
+            value={formatBytes((node.trafficUpMonthly !== undefined && node.trafficUpMonthly !== null) ? node.trafficUpMonthly : node.trafficUp)}
           />
           <CompactInfoRow
             icon={(
@@ -538,7 +538,7 @@ function CompactNodeInfoStrip({
                 aria-label="下行"
               />
             )}
-            value={formatBytes(node.trafficDown)}
+            value={formatBytes((node.trafficDownMonthly !== undefined && node.trafficDownMonthly !== null) ? node.trafficDownMonthly : node.trafficDown)}
           />
         </CompactInfoTile>
       )}

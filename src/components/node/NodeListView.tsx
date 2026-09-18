@@ -364,8 +364,14 @@ const NodeRow = memo(function NodeRow({ uuid }: { uuid: string }) {
         title={`剩余 ${traffic.remainingLabel} · ${traffic.detail}`}
       >
         <div className="node-list-traffic-rows">
-          <StackLine icon={<ArrowUp size={11} strokeWidth={2.1} />} value={formatBytes(node.trafficUp)} />
-          <StackLine icon={<ArrowDown size={11} strokeWidth={2.1} />} value={formatBytes(node.trafficDown)} />
+          <StackLine
+            icon={<ArrowUp size={11} strokeWidth={2.1} />}
+            value={formatBytes((node.trafficUpMonthly !== undefined && node.trafficUpMonthly !== null) ? node.trafficUpMonthly : node.trafficUp)}
+          />
+          <StackLine
+            icon={<ArrowDown size={11} strokeWidth={2.1} />}
+            value={formatBytes((node.trafficDownMonthly !== undefined && node.trafficDownMonthly !== null) ? node.trafficDownMonthly : node.trafficDown)}
+          />
         </div>
         <span className="node-list-traffic-quota" style={{ color: traffic.color }}>
           {usedPct}

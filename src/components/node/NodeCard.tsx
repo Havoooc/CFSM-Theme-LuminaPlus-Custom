@@ -304,13 +304,20 @@ function NodeTrafficSection({
   isOnline: boolean;
   redrawKey: string;
 }) {
+  const upTotal = (node.trafficUpMonthly !== undefined && node.trafficUpMonthly !== null)
+    ? node.trafficUpMonthly
+    : node.trafficUp;
+  const downTotal = (node.trafficDownMonthly !== undefined && node.trafficDownMonthly !== null)
+    ? node.trafficDownMonthly
+    : node.trafficDown;
+
   return (
     <div className="card-metric-section server-traffic-section">
       <TrafficStat
         direction="上行"
         totalLabel="出站"
         rate={upRate}
-        total={formatBytes(node.trafficUp)}
+        total={formatBytes(upTotal)}
         samples={trafficTrend.up}
         live={isOnline}
         active={node.netUp > 0}
@@ -322,7 +329,7 @@ function NodeTrafficSection({
         direction="下行"
         totalLabel="入站"
         rate={downRate}
-        total={formatBytes(node.trafficDown)}
+        total={formatBytes(downTotal)}
         samples={trafficTrend.down}
         live={isOnline}
         active={node.netDown > 0}

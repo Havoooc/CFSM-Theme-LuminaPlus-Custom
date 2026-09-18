@@ -245,16 +245,16 @@ function MiniFlow({
           title="实时下行"
         />
       </div>
-      <div className="mini-node-flow-group" aria-label="累计流量">
+      <div className="mini-node-flow-group" aria-label="月度流量">
         <MiniFlowRow
           icon={<ArrowUp size={12} strokeWidth={2.2} />}
-          value={formatBytes(node.trafficUp)}
-          title="累计上行"
+          value={formatBytes((node.trafficUpMonthly !== undefined && node.trafficUpMonthly !== null) ? node.trafficUpMonthly : node.trafficUp)}
+          title="月度上行"
         />
         <MiniFlowRow
           icon={<ArrowDown size={12} strokeWidth={2.2} />}
-          value={formatBytes(node.trafficDown)}
-          title="累计下行"
+          value={formatBytes((node.trafficDownMonthly !== undefined && node.trafficDownMonthly !== null) ? node.trafficDownMonthly : node.trafficDown)}
+          title="月度下行"
         />
       </div>
     </div>
