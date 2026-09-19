@@ -37,8 +37,50 @@ export function classifyReturnRoute(label: string): ReturnRouteQuality {
   return "standard";
 }
 
+export function formatRelativeTime(value: string | number | null | undefined): string | null {
+  if (!value) return null;
+  const time = typeof value === "string" ? new Date(value).getTime() : value;
+  if (!Number.isFinite(time) || time <= 0) return null;
+  const diffSec = Math.floor((Date.now() - time) / 1000);
+  if (diffSec < 60) return "刚刚";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}分钟前`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}小时前`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}天前`;
+}
+
+export interface ReturnRouteMeta {
+  carrierKey?: "telecom" | "unicom" | "mobile";
+  confidence?: string;
+  reason?: string;
+  probedAt?: string;
+}
+
 /** 国内节点不存在「国际回程」，措辞上避免出现「回程线路：国内电信」这种自相矛盾。 */
-export function returnRouteTitle(label: string, quality: ReturnRouteQuality): string {
+export function returnRouteTitle(
+  label: string,
+  quality: ReturnRouteQuality,
+  meta?: ReturnRouteMeta
+): string {
   const prefix = label.trim().startsWith("国内") ? "线路" : "回程线路";
-  return `${prefix}：${label}，${RETURN_ROUTE_QUALITY_LABEL[quality]}`;
+  const parts: string[] = [`${prefix}：${label}，${RETURN_ROUTE_QUALITY_LABEL[quality]}`];
+
+  if (meta?.confidence === "stale") {
+    parts.push("（陈旧缓存/本次无结论）");
+  }
+
+  if (meta?.probedAt) {
+    const rel = formatRelativeTime(meta.probedAt);
+    if (rel) {
+      parts.push(`检测于 ${rel}`);
+    }
+  }
+
+  if (meta?.reason) {
+    parts.push(`依据：${meta.reason}`);
+  }
+
+  return parts.join(" · ");
 }

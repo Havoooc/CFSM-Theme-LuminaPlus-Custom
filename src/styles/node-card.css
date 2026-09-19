@@ -530,6 +530,11 @@
   --route-badge-fg: var(--status-warning);
 }
 
+.multi-ping-route-badge.is-stale {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
 .multi-ping-route-separator {
   opacity: 0.65;
 }

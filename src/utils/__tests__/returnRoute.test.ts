@@ -58,4 +58,16 @@ describe("returnRouteTitle", () => {
     expect(RETURN_ROUTE_QUALITY_LABEL.good).toBe("良好");
     expect(RETURN_ROUTE_QUALITY_LABEL.standard).toBe("一般");
   });
+
+  it("appends stale warning, relative time, and reason when meta is provided", () => {
+    const title = returnRouteTitle("CMI", "good", {
+      confidence: "stale",
+      reason: "保留旧值（本次无结论）",
+      probedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
+    });
+    expect(title).toContain("回程线路：CMI，良好");
+    expect(title).toContain("（陈旧缓存/本次无结论）");
+    expect(title).toContain("检测于 1小时前");
+    expect(title).toContain("依据：保留旧值（本次无结论）");
+  });
 });

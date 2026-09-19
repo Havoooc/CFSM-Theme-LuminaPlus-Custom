@@ -68,9 +68,28 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
   const valueColor = metric === "latency" ? latencyColor : lossColor;
   const unit = metric === "latency" ? "ms" : "%";
   const waiting = isLoading && value == null;
+  const carrierKey = metric === "latency" ? returnRouteCarrierKey(line.taskId) : undefined;
   const routeLabel =
-    metric === "latency" ? returnRouteLabel(line.taskId, returnRoute) : undefined;
+    carrierKey && returnRoute ? returnRoute[carrierKey]?.trim() || undefined : undefined;
   const routeQuality = routeLabel ? classifyReturnRoute(routeLabel) : undefined;
+  const routeConfidence =
+    carrierKey && returnRoute
+      ? (returnRoute.confidence as Record<string, string> | undefined)?.[carrierKey]
+      : undefined;
+  const isRouteStale = routeConfidence === "stale";
+  const routeReason =
+    carrierKey && returnRoute
+      ? (returnRoute.reason as Record<string, string> | undefined)?.[carrierKey]
+      : undefined;
+  const routeTitle =
+    routeLabel && routeQuality
+      ? returnRouteTitle(routeLabel, routeQuality, {
+          carrierKey,
+          confidence: routeConfidence,
+          reason: routeReason,
+          probedAt: typeof returnRoute?.probed_at === "string" ? returnRoute.probed_at : undefined,
+        })
+      : undefined;
   const displayValue =
     waiting
       ? "..."
@@ -100,9 +119,13 @@ const MultiPingMetricRow = memo(function MultiPingMetricRow({
             <PingLineSwitcher uuid={uuid} slot={slot} taskName={line.taskName} />
             {routeLabel && routeQuality && (
               <span
-                className={clsx("multi-ping-route-badge", `is-${routeQuality}`)}
-                title={returnRouteTitle(routeLabel, routeQuality)}
-                aria-label={returnRouteTitle(routeLabel, routeQuality).replace("：", " ")}
+                className={clsx(
+                  "multi-ping-route-badge",
+                  `is-${routeQuality}`,
+                  isRouteStale && "is-stale"
+                )}
+                title={routeTitle}
+                aria-label={routeTitle?.replace("：", " ")}
               >
                 <span>{routeLabel}</span>
                 <span className="multi-ping-route-separator" aria-hidden="true">
@@ -234,11 +257,10 @@ export const MultiPingStatus = memo(function MultiPingStatus({
   );
 });
 
-function returnRouteLabel(taskId: number, route?: ReturnRoute): string | undefined {
-  if (!route) return undefined;
+function returnRouteCarrierKey(taskId: number): "telecom" | "unicom" | "mobile" | undefined {
   const key = CARRIER_TASK_BY_ID.get(taskId)?.key;
-  if (key === "ct") return route.telecom?.trim() || undefined;
-  if (key === "cu") return route.unicom?.trim() || undefined;
-  if (key === "cm") return route.mobile?.trim() || undefined;
+  if (key === "ct") return "telecom";
+  if (key === "cu") return "unicom";
+  if (key === "cm") return "mobile";
   return undefined;
 }
